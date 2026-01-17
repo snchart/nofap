@@ -1,0 +1,55 @@
+#!/bin/sh
+timestampfile="$HOME/.nofap/timestamp"
+nofapdays="$(( ($(date +%s) - $(cat $timestampfile) ) / 86400))"
+nonunixts=$(date -d @$(cat "$timestampfile") +'%Y-%m-%d %H:%M')
+
+
+timestamp(){
+        printf " ==> making timestamp on $(date +%m/%d/%y)...\n"
+        mkdir -p $HOME/.nofap
+        printf "$(date +%s)" > "$timestampfile"
+}
+
+case "$1" in
+    start*) 
+        timestamp
+    ;;
+    reset*)
+        printf " Are you sure to reset? [y/n] "
+        read ANS
+        case $ANS in
+            [Yy]*) 
+                printf " ==> reseting...\n"
+                timestamp
+                printf " NOOOOOOOO FAP ENVIRONMENTING\n"
+            ;;
+            [Nn]*)
+                exit 1
+            ;;
+        esac
+    ;;
+    info*)
+        if [ "$(date +%s)" -lt "$(cat "$timestampfile")" ]; then
+            printf "oops! there's the error with your time! today's date less than timestaps's\n"
+            exit 1
+        fi
+        echo "you didn't jerked off since $nonunixts ($nofapdays days)"
+        if [ "$nofapdays" -lt 1 ]; then
+            printf "the first day often goes hard, but you can do it!\n"
+        elif [ "$nofapdays" -ge 1 ] && [ "$nofapdays" -le 6 ]; then
+            printf "good job pal, you doin it!\n"
+        elif [ "$nofapdays" -ge 7 ] && [ "$nofapdays" -le 13 ]; then
+            printf "damn son good job\n"
+        elif [ "$nofapdays" -ge 14 ] && [ "$nofapdays" -le 29 ]; then
+            printf "you abstaining very well\n"
+        elif [ "$nofapdays" -ge 30 ] && [ "$nofapdays" -le 179 ]; then
+            printf "several months, that's awesome!\n"
+        elif [ "$nofapdays" -ge 180 ] && [ "$nofapdays" -le 355 ]; then
+            printf "second half of year you abstain, that's very very cool\n"
+        elif [ "$nofapdays" -ge 356 ] && [ "$nofapdays" -le 2919 ]; then
+            printf "i have nothing to say because that AWESOME you didn't did it by years\n"
+        elif [ "$nofapdays" -ge 2920 ]; then
+            printf "maybe is your time broken, but if you fr, i have nothing to say\n"
+        fi
+    ;;
+esac
