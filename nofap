@@ -3,15 +3,22 @@ timestampfile="$HOME/.nofap/timestamp"
 nofapdays="$(( ($(date +%s) - $(tail -n 1 $timestampfile) ) / 86400))"
 nonunixts=$(date -d @$(tail -n 1 "$timestampfile") +'%Y-%m-%d %H:%M')
 
-pretext="       _      
-|\ | _ |__.._  
-| \|(_)|(_||_) 
-           '   "
+pretext="         _      
+  |\ | _ |__.._  
+  | \|(_)|(_||_) 
+             '   "
 
 timestamp(){
         printf " ==> making timestamp on $(date +%m/%d/%y)...\n"
         mkdir -p $HOME/.nofap
         echo "$(date +%s)" >> "$timestampfile"
+}
+
+daysname(){
+    if [ "$(printf "$nofapdays" | tail -c 1)" = "1" ]; then
+        printf "day"
+    else printf "days"
+    fi
 }
 
 case "$1" in
@@ -34,22 +41,27 @@ case "$1" in
             printf "oops! there's the error with your time! today's date less than timestaps's\n"
             exit 1
         fi
-        printf " == you didn't jerked off since $nonunixts ($nofapdays days)\n"
+        printf " == you reseted $(cat "$timestampfile" | wc -l) times, starting from $(date -d @$(head -n 1 "$timestampfile") +'%Y-%m-%d %H:%M') \n"
+        printf " == last five resets:\n"
+        tail -n 5 "$timestampfile" | while read line; do
+            printf "    %s\n" "$(date -d "@$line" +'%Y-%m-%d %H:%M')"
+        done
+        printf "\n == you didn't jerked off since $nonunixts ($nofapdays $(daysname))\n"
         if [ "$nofapdays" -lt 1 ]; then
             printf " == the first day often goes hard, but you can do it!\n"
         elif [ "$nofapdays" -ge 1 ] && [ "$nofapdays" -le 3 ]; then
-            printf " == Current state: \n   Day 1-3: Strong urges. Energy and focus may start shifting.\n"
+            printf " == Current state: \n    Day 1-3: Strong urges. Energy and focus may start shifting.\n"
         elif [ "$nofapdays" -ge 4 ] && [ "$nofapdays" -le 7 ]; then
-            printf " == Current state: \n   Day 4-7: Peak cravings. Increased motivation and sexual tension.\n"
+            printf " == Current state: \n    Day 4-7: Peak cravings. Increased motivation and sexual tension.\n"
         elif [ "$nofapdays" -ge 7 ] && [ "$nofapdays" -le 17 ]; then
-            printf " == Current state: \n   Week 2: More stable energy. Improved focus and confidence \n"
+            printf " == Current state: \n    Week 2: More stable energy. Improved focus and confidence \n"
         elif [ "$nofapdays" -ge 17 ] && [ "$nofapdays" -le 365 ]; then
-            printf " == Current state: \n   Months later, a new baseline is established. Deep focus and stable energy are the norm \n"
+            printf " == Current state: \n    Months later: a new baseline is established. Deep focus and stable energy are the norm \n"
         elif [ "$nofapdays" -ge 365 ]; then
-            printf " == Current state: \n   the habit has a high chance of not returning \n"
+            printf " == Current state: \n    Years later: the habit has a high chance of not returning \n"
         fi
-        printf " == you reseted $(cat "$timestampfile" | wc -l) times, starting from $(date -d @$(head -n 1 "$timestampfile") +'%Y-%m-%d %H:%M') \n"
     ;;
+    bar*) printf "$nofapdays" ;;
 esac
 
 printf "\n"
