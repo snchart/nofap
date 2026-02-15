@@ -1,4 +1,5 @@
 #!/bin/sh
+printf "\n"
 [ -d "$HOME/.nofap" ] || mkdir -p $HOME/.nofap
 [ -f "$HOME/.nofap/timestamp" ] || touch $HOME/.nofap/timestamp
 [ -d "$HOME/.nofap/notes" ] || mkdir -p $HOME/.nofap/notes
@@ -74,3 +75,5 @@ case "$1" in
     ;;
     readnote*) note_read "$2" ;;
 esac
+
+printf "\n"
