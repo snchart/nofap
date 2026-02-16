@@ -1,21 +1,15 @@
 #!/bin/sh
-printf "\n"
 [ -d "$HOME/.nofap" ] || mkdir -p $HOME/.nofap
 [ -f "$HOME/.nofap/timestamp" ] || touch $HOME/.nofap/timestamp
 [ -d "$HOME/.nofap/notes" ] || mkdir -p $HOME/.nofap/notes
 timestamp_file="$HOME/.nofap/timestamp"
 days="$(( ($(date +%s) - $(tail -n 1 $timestamp_file) ) / 86400))"
 case "$(uname -s)" in
-    *BSD*|*Darwin*)
-        last_date="$(date -r $(tail -n 1 "$timestamp_file") +'%Y-%m-%d %H:%M')"
-        first_date="$(date -r $(head -n 1 "$timestamp_file") +'%Y-%m-%d %H:%M')"
-    ;;
-    *)
-        last_date="$(date -d @$(tail -n 1 "$timestamp_file") +'%Y-%m-%d %H:%M')"
-        first_date="$(date -d @$(head -n 1 "$timestamp_file") +'%Y-%m-%d %H:%M')"
-    ;;
+    *BSD*|*Darwin*) unix_convert="date -r" ;;
+    *) unix_convert="date -d @" ;;
 esac
-
+last_date="$($unix_convert$(tail -n 1 "$timestamp_file") +'%Y-%m-%d %H:%M')"
+first_date="$($unix_convert$(head -n 1 "$timestamp_file") +'%Y-%m-%d %H:%M')"
 timestamp(){
     printf " ==> making the timestamp on $(date +%m/%d/%y)\n"
     printf "$(date +%s)\n" >> "$timestamp_file"
@@ -32,10 +26,7 @@ day_name(){
 reset_list(){
     printf " ==> last 5 resets:\n" 
     tail -n 5 "$timestamp_file" | while read line; do
-        case "$(uname -s)" in
-            *BSD*|*Darwin*) printf "     %s\n" "$(date -r "$line" +'%Y-%m-%d %H:%M')";;
-            *) printf "     %s\n" "$(date -d "@$line" +'%Y-%m-%d %H:%M')";;
-        esac
+        printf "     %s\n" "$($unix_convert"$line" +'%Y-%m-%d %H:%M')"
     done
 }
 
@@ -75,5 +66,3 @@ case "$1" in
     ;;
     readnote*) note_read "$2" ;;
 esac
-
-printf "\n"
